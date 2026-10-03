@@ -25,6 +25,17 @@ target_include_directories(laya PRIVATE
 )
 
 target_link_libraries(laya PRIVATE ggmlc_runtime)
+
+if (GGMLC_ENABLE_AMDXDNA)
+    file(RELATIVE_PATH _laya_library_dir
+        "${CMAKE_INSTALL_FULL_BINDIR}" "${CMAKE_INSTALL_FULL_LIBDIR}")
+    get_filename_component(_laya_xrt_library_dir "${GGMLC_XRT_COREUTIL_LIBRARY}" DIRECTORY)
+    set_target_properties(laya PROPERTIES
+        INSTALL_RPATH "$ORIGIN/${_laya_library_dir};${_laya_xrt_library_dir}"
+        INSTALL_RPATH_USE_LINK_PATH FALSE)
+endif()
+install(TARGETS laya RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT Laya)
+
 if (WIN32)
     target_link_libraries(laya PRIVATE ws2_32)
 endif()
