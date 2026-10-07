@@ -119,6 +119,35 @@ plugin, and amdxdna/firmware remain system dependencies, as described above.
 The system XRT library directory is retained in the installed RPATH for
 installations using an XRT prefix outside the system loader's default paths.
 
+## Create a local release archive
+
+The `laya-package` target builds Laya, stages its install component, and
+creates a `.tar.gz` with `bin`, `lib`, `share`, a generated README,
+`BUILD-INFO.txt`, and per-file SHA-256 checksums. It also writes an archive
+checksum beside the `.tar.gz`. It performs no GitHub operations or commits.
+
+```bash
+cmake -S . -B build/laya-release-amdxdna \
+  -DCMAKE_BUILD_TYPE=Release -DGGMLC_ENABLE_AMDXDNA=ON -DGGML_NATIVE=OFF \
+  -DGGMLC_BUILD_EXAMPLE_TIMESFM=OFF -DGGMLC_BUILD_EXAMPLE_TAB_COMPLETION=OFF \
+  -DGGMLC_LAYA_PACKAGE_NAME=laya-linux-x86_64-amdxdna-ubuntu26.04 \
+  -DGGMLC_LAYA_PACKAGE_OUTPUT_DIR="$PWD/dist"
+cmake --build build/laya-release-amdxdna --target laya-package -j8
+cd dist
+sha256sum -c laya-linux-x86_64-amdxdna-ubuntu26.04.tar.gz.sha256
+```
+
+Without overrides, the archive name is `laya-linux-x86_64-amdxdna.tar.gz`
+and the output directory is `<build>/dist`. Package names must be filenames,
+and install directories must be relative to the prefix. There is no sudo
+step when packaging locally. The entire extracted directory can be moved.
+
+The package includes application runtime assets and licenses. The target
+machine supplies XRT, the XDNA plugin, amdxdna/firmware, glibc and libstdc++.
+The package records minimum GLIBC/GLIBCXX/CXXABI symbol versions from its ELF
+files, so a binary built on a newer Ubuntu is not labeled compatible with
+older releases. GGUF model files are downloaded separately.
+
 F32/F16/BF16 and supported GGML quantized weights (including Q8_0 and Q4_K)
 are decoded once and cached as packed BF16. For English Q8_0 the offloaded
 weight cache is 765,198,336 bytes, in addition to the original host weights,

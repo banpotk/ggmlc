@@ -51,6 +51,18 @@ under the prefix using the default install directories. The executable finds
 them relative to its location; copy the complete installed tree to relocate it.
 XRT and the amdxdna driver must be available on the target system.
 
+For a local NPU release archive, build `laya-package` instead of copying only
+the executable. It creates a `.tar.gz` and SHA-256 file under `<build>/dist`:
+
+```bash
+cmake --build build/amdxdna --target laya-package -j8
+```
+
+The archive includes the library, NPU kernel, licenses, README, build/ABI
+requirements and file checksums. Configure `GGMLC_LAYA_PACKAGE_NAME` and
+`GGMLC_LAYA_PACKAGE_OUTPUT_DIR` to change its name and destination. Packaging
+does not upload files or create commits.
+
 ### Binaries (`laya.exe` / `laya`)
 
 GitHub Release artifacts from the **`latest`** tag: [monatis/ggmlc releases](https://github.com/monatis/ggmlc/releases/latest)
